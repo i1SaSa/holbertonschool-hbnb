@@ -16,12 +16,6 @@ class User():
         self.reviews = []  # List to store reviews
         self.places = []  # List to store places user can hold (if owner)
 
-    def update_profile(self, first_name, last_name, email, password):
-        self.first_name = first_name
-        self.last_name = last_name
-        self.email = email
-        self.__password__ = password
-
     def delete(self):
         del self
 

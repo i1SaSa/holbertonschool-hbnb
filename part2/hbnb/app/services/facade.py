@@ -5,7 +5,6 @@ from app.models.place import Place
 from app.models.review import Review
 
 
-
 class HBnBFacade:
 
     def __init__(self):
@@ -163,7 +162,7 @@ class HBnBFacade:
             amenity.name = amenity_data["name"]
 
         return amenity
-    
+
 
 # ================= REVIEW =================
 
@@ -190,21 +189,17 @@ class HBnBFacade:
 
         return review
 
-
     def get_review(self, review_id):
         return self.review_repo.get(review_id)
 
-
     def get_all_reviews(self):
         return self.review_repo.get_all()
-
 
     def get_reviews_by_place(self, place_id):
         place = self.place_repo.get(place_id)
         if not place:
             return None
         return place.reviews
-
 
     def update_review(self, review_id, review_data):
         review = self.review_repo.get(review_id)
@@ -213,7 +208,6 @@ class HBnBFacade:
 
         review.update(review_data)
         return review
-
 
     def delete_review(self, review_id):
         review = self.review_repo.get(review_id)
@@ -226,3 +220,6 @@ class HBnBFacade:
 
         self.review_repo.delete(review_id)
         return True
+
+
+facade = HBnBFacade()

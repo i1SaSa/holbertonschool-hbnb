@@ -26,13 +26,13 @@ class Place(BaseModel):
         # List of Review objects
         self.reviews = []
 
-
     # ----------------------
     # Title
     # ----------------------
+
     @property
     def title(self):
-        return self.__title
+        return self._title
 
     @title.setter
     def title(self, value):
@@ -42,15 +42,15 @@ class Place(BaseModel):
         if len(value.strip()) == 0:
             raise ValueError("Title cannot be empty")
 
-        self.__title = value
-
+        self._title = value
 
     # ----------------------
     # Price
     # ----------------------
+
     @property
     def price(self):
-        return self.__price
+        return self._price
 
     @price.setter
     def price(self, value):
@@ -60,15 +60,15 @@ class Place(BaseModel):
         if value <= 0:
             raise ValueError("Price must be greater than 0")
 
-        self.__price = value
-
+        self._price = value
 
     # ----------------------
     # Latitude
     # ----------------------
+
     @property
     def latitude(self):
-        return self.__latitude
+        return self._latitude
 
     @latitude.setter
     def latitude(self, value):
@@ -78,15 +78,15 @@ class Place(BaseModel):
         if value < -90 or value > 90:
             raise ValueError("Latitude must be between -90 and 90")
 
-        self.__latitude = value
-
+        self._latitude = value
 
     # ----------------------
     # Longitude
     # ----------------------
+
     @property
     def longitude(self):
-        return self.__longitude
+        return self._longitude
 
     @longitude.setter
     def longitude(self, value):
@@ -96,25 +96,20 @@ class Place(BaseModel):
         if value < -180 or value > 180:
             raise ValueError("Longitude must be between -180 and 180")
 
-        self.__longitude = value
+        self._longitude = value
 
     def add_review(self, review):
         if review not in self.reviews:
             self.reviews.append(review)
 
-    def add_review(self, review):
-        self.reviews.append(review)
-
-
-
     def remove_review(self, review):
         if review in self.reviews:
             self.reviews.remove(review)
 
-
     # ----------------------
     # Serialization
     # ----------------------
+
     def to_dict(self):
         return {
             "id": self.id,

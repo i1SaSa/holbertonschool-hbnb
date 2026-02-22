@@ -2,6 +2,7 @@ import uuid
 from .basemodel import BaseModel
 from datetime import datetime
 
+
 class Review(BaseModel):
     """
     Represents a review.

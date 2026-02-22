@@ -87,7 +87,6 @@ class User(BaseModel):
         if "email" in data:
             self.email = data["email"]
 
-
     def to_dict(self):
         return {
             "id": self.id,

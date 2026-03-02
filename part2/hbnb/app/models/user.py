@@ -17,41 +17,47 @@ class User(BaseModel):
     # ----------------------
     @property
     def first_name(self):
-        return self.__first_name
+        return self._first_name
 
     @first_name.setter
     def first_name(self, value):
         if not isinstance(value, str):
             raise TypeError("First name must be a string")
 
+        if len(value.strip()) == 0:
+            raise ValueError("First name cannot be empty")
+
         if len(value) > 50:
             raise ValueError("First name must be 50 characters max.")
 
-        self.__first_name = value
+        self._first_name = value
 
     # ----------------------
     # Last Name
     # ----------------------
     @property
     def last_name(self):
-        return self.__last_name
+        return self._last_name
 
     @last_name.setter
     def last_name(self, value):
         if not isinstance(value, str):
             raise TypeError("Last name must be a string")
 
+        if len(value.strip()) == 0:
+            raise ValueError("First name cannot be empty")
+
         if len(value) > 50:
             raise ValueError("Last name must be 50 characters max.")
 
-        self.__last_name = value
+        self._last_name = value
 
     # ----------------------
     # Email
     # ----------------------
     @property
     def email(self):
-        return self.__email
+        return self._email
 
     @email.setter
     def email(self, value):
@@ -61,21 +67,21 @@ class User(BaseModel):
         if "@" not in value:
             raise ValueError("Invalid email format")
 
-        self.__email = value
+        self._email = value
 
     # ----------------------
     # Is Admin
     # ----------------------
     @property
     def is_admin(self):
-        return self.__is_admin
+        return self._is_admin
 
     @is_admin.setter
     def is_admin(self, value):
         if not isinstance(value, bool):
             raise TypeError("Is Admin must be a boolean")
 
-        self.__is_admin = value
+        self._is_admin = value
 
     def update(self, data):
         if "first_name" in data:

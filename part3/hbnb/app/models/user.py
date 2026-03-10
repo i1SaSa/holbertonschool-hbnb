@@ -132,5 +132,6 @@ class User(BaseModel):
             "id": self.id,
             "first_name": self.first_name,
             "last_name": self.last_name,
-            "email": self.email
+            "email": self.email,
+            "is_admin": self.is_admin
         }

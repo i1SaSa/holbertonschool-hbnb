@@ -1,3 +1,5 @@
+from app import db  
+from app.models import user, place, review, amenity  
 from abc import ABC, abstractmethod
 from app import db
 
@@ -61,6 +63,8 @@ class InMemoryRepository(Repository):
              if getattr(obj, attr_name, None) == attr_value),
             None
         )
+
+
 class SQLAlchemyRepository(Repository):
     def __init__(self, model):
         self.model = model
@@ -89,4 +93,4 @@ class SQLAlchemyRepository(Repository):
             db.session.commit()
 
     def get_by_attribute(self, attr_name, attr_value):
-        return self.model.query.filter_by(**{attr_name: attr_value}).first()
+        return self.model.query.filter(getattr(self.model, attr_name) == attr_value).first()

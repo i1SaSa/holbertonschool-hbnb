@@ -1,6 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from flask import request
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 from app.services import facade
 
 api = Namespace('users', description='User operations')
@@ -36,10 +36,19 @@ class UserList(Resource):
         users = facade.get_all_users()
         return [u.to_dict() for u in users], 200
 
-
     @api.expect(user_create_model, validate=True)
     @api.marshal_with(user_model, code=201)
+    @jwt_required()
     def post(self):
+        current_user = get_jwt()
+        if not current_user.get('is_admin'):
+            return {'error': 'Admin privileges required'}, 403
+
+        user_data = request.json
+        email = user_data.get('email')
+
+        if facade.get_user_by_attribute('email', email):
+            return {'error': 'Email already registered'}, 400
         try:
             user = facade.create_user(request.json)
             return user.to_dict(), 201
@@ -55,7 +64,6 @@ class UserResource(Resource):
         if not user:
             api.abort(404, "User not found")
         return user.to_dict(), 200
-
 
     @jwt_required()
     def put(self, user_id):

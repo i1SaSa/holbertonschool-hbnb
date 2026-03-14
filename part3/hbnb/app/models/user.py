@@ -1,137 +1,68 @@
-from .basemodel import BaseModel
-from flask_bcrypt import Bcrypt
-
-bcrypt = Bcrypt()
+#!/usr/bin/python3
+"""User model module for the application."""
+import re
+from sqlalchemy import Column, String, Boolean
+from sqlalchemy.orm import validates, relationship
+from flask_bcrypt import generate_password_hash, check_password_hash
+from app.models.basemodel import BaseModel, db
 
 
 class User(BaseModel):
+    __tablename__ = 'users'
 
-    def __init__(self, first_name, last_name, email, password, is_admin=False):
-        super().__init__()
+    email = Column(String(120), nullable=False, unique=True)
+    first_name = Column(String(50), nullable=False)
+    last_name = Column(String(50), nullable=False)
+    password = Column(String(128), nullable=False)
+    is_admin = Column(Boolean, default=False)
 
-        self.first_name = first_name
-        self.last_name = last_name
-        self.email = email
-        self.is_admin = is_admin
+    places = relationship('Place', back_populates='owner', lazy=True, cascade='all, delete-orphan')
+    reviews = relationship('Review', back_populates='user', lazy=True, cascade='all, delete-orphan')
 
-        # Store password securely
-        self.password_hash = None
-        self.set_password(password)
+    def __init__(self, **kwargs):
+        if 'password' in kwargs:
+            kwargs['password'] = self.hash_password(kwargs['password'])
+        super().__init__(**kwargs)
 
-        self.places = []
-        self.reviews = []
+    @validates('email')
+    def validate_email(self, key, email):
+        pattern = r"[^@]+@[^@]+\.[^@]+"
+        if not re.match(pattern, email):
+            raise ValueError(f"Invalid email format: {email}")
+        return email
 
-    # ----------------------
-    # Password handling
-    # ----------------------
-    def set_password(self, password):
-        """
-        Hash and store the password securely
-        """
-        if not isinstance(password, str):
-            raise TypeError("Password must be a string")
+    @validates('first_name', 'last_name')
+    def validate_name(self, key, name):
+        if not name or not name.strip():
+            raise ValueError(f"{key.replace('_', ' ').capitalize()} cannot be empty")
+        if len(name) > 50:
+            raise ValueError(f"{key.replace('_', ' ').capitalize()} must not exceed 50 characters")
+        return name
 
-        if len(password) < 6:
-            raise ValueError("Password must be at least 6 characters")
+    def hash_password(self, password):
+        return generate_password_hash(password).decode('utf-8')
 
-        self.password_hash = bcrypt.generate_password_hash(
-            password).decode("utf-8")
-
-    def check_password(self, password):
-        """
-        Check if provided password matches the stored hash
-        """
-        return bcrypt.check_password_hash(self.password_hash, password)
-
-    # ----------------------
-    # First Name
-    # ----------------------
-    @property
-    def first_name(self):
-        return self._first_name
-
-    @first_name.setter
-    def first_name(self, value):
-        if not isinstance(value, str):
-            raise TypeError("First name must be a string")
-
-        if len(value.strip()) == 0:
-            raise ValueError("First name cannot be empty")
-
-        if len(value) > 50:
-            raise ValueError("First name must be 50 characters max.")
-
-        self._first_name = value
-
-    # ----------------------
-    # Last Name
-    # ----------------------
-    @property
-    def last_name(self):
-        return self._last_name
-
-    @last_name.setter
-    def last_name(self, value):
-        if not isinstance(value, str):
-            raise TypeError("Last name must be a string")
-
-        if len(value.strip()) == 0:
-            raise ValueError("Last name cannot be empty")
-
-        if len(value) > 50:
-            raise ValueError("Last name must be 50 characters max.")
-
-        self._last_name = value
-
-    # ----------------------
-    # Email
-    # ----------------------
-    @property
-    def email(self):
-        return self._email
-
-    @email.setter
-    def email(self, value):
-        if not isinstance(value, str):
-            raise TypeError("Email must be a string")
-
-        if "@" not in value:
-            raise ValueError("Invalid email format")
-
-        self._email = value
-
-    # ----------------------
-    # Is Admin
-    # ----------------------
-    @property
-    def is_admin(self):
-        return self._is_admin
-
-    @is_admin.setter
-    def is_admin(self, value):
-        if not isinstance(value, bool):
-            raise TypeError("Is Admin must be a boolean")
-
-        self._is_admin = value
+    def verify_password(self, password):
+        return check_password_hash(self.password, password)
 
     def update(self, data):
-        if "first_name" in data:
-            self.first_name = data["first_name"]
-
-        if "last_name" in data:
-            self.last_name = data["last_name"]
-
-        if "email" in data:
-            self.email = data["email"]
+        """Update user data with validation"""
+        for key, value in data.items():
+            if hasattr(self, key) and key not in ['id', 'created_at', 'updated_at']:
+                if key == 'password':
+                    setattr(self, key, self.hash_password(value))
+                else:
+                    setattr(self, key, value)
+        self.update_timestamp()
 
     def to_dict(self):
-        """
-        Return user data without password
-        """
+        """Convert user to dictionary (without password)"""
         return {
             "id": self.id,
             "first_name": self.first_name,
             "last_name": self.last_name,
             "email": self.email,
-            "is_admin": self.is_admin
+            "is_admin": self.is_admin,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
         }

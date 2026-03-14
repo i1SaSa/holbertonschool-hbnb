@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Database
+instance/
+*.db
+*.sqlite3
+
+# Project specific
+create_admin.py
+debug_models.py
+final_fix.py
+test_db.py
+part3_complete.txt
+collect_files.sh
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

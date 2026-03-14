@@ -1,81 +1,66 @@
-import uuid
-from .basemodel import BaseModel
-from datetime import datetime
+#!/usr/bin/python3
+"""Review model module for the application."""
+from sqlalchemy import Column, String, Integer, ForeignKey, Text
+from sqlalchemy.orm import validates, relationship
+from app.models.basemodel import BaseModel, db
 
 
 class Review(BaseModel):
-    """
-    Represents a review.
-    Can be created in two ways:
-    1) Simple review with name (for old tests)
-    2) Full review with text, rating, place, and user
-    """
+    """Review model for SQLAlchemy"""
+    __tablename__ = 'reviews'
 
-    def __init__(self, name=None, text=None, rating=None, place=None, user=None):
-        super().__init__()
+    # Columns
+    text = Column(Text, nullable=False)
+    rating = Column(Integer, nullable=False)
 
-        # Case 1: simple review (used in some tests)
-        if name is not None:
-            self.name = name
-            return
+    # Foreign Keys
+    user_id = Column(String(36), ForeignKey('users.id'), nullable=False)
+    place_id = Column(String(36), ForeignKey('places.id'), nullable=False)
 
-        # Case 2: full review
-        self.text = text
-        self.rating = rating
-        self.place = place
-        self.user = user
+    # Relationships
+    user = relationship('User', back_populates='reviews', lazy=True)
+    place = relationship('Place', back_populates='reviews', lazy=True)
 
-    # ---------- Name (for simple test mode) ----------
-    @property
-    def name(self):
-        return getattr(self, "_Review__name", None)
+    def __init__(self, **kwargs):
+        """Initialize review"""
+        super().__init__(**kwargs)
 
-    @name.setter
-    def name(self, value):
-        if not isinstance(value, str):
-            raise TypeError("Name must be a string")
-        if len(value) > 50:
-            raise ValueError("Name must be 50 characters max.")
-        self.__name = value
-
-    # ---------- Text ----------
-    @property
-    def text(self):
-        return getattr(self, "_Review__text", None)
-
-    @text.setter
-    def text(self, value):
-        if not isinstance(value, str):
+    # ----------------------
+    # Validators
+    # ----------------------
+    @validates('text')
+    def validate_text(self, key, text):
+        """Validate text"""
+        if not isinstance(text, str):
             raise TypeError("Text must be a string")
-        if len(value.strip()) == 0:
+        if len(text.strip()) == 0:
             raise ValueError("Text cannot be empty")
-        self.__text = value
+        return text.strip()
 
-    # ---------- Rating ----------
-    @property
-    def rating(self):
-        return getattr(self, "_Review__rating", None)
-
-    @rating.setter
-    def rating(self, value):
-        if not isinstance(value, int):
+    @validates('rating')
+    def validate_rating(self, key, rating):
+        """Validate rating"""
+        if not isinstance(rating, int):
             raise TypeError("Rating must be an integer")
-        if value < 1 or value > 5:
+        if rating < 1 or rating > 5:
             raise ValueError("Rating must be between 1 and 5")
-        self.__rating = value
+        return rating
 
-    # ---------- Serialization ----------
+    def update(self, data):
+        """Update review data with validation"""
+        for key, value in data.items():
+            if hasattr(self, key) and key not in ['id', 'created_at', 'updated_at', 'user_id', 'place_id']:
+                setattr(self, key, value)
+        self.update_timestamp()
+
     def to_dict(self):
-        if hasattr(self, "_Review__name"):
-            return {
-                "id": self.id,
-                "name": self.name
-            }
-
+        """Convert review to dictionary"""
         return {
             "id": self.id,
             "text": self.text,
             "rating": self.rating,
-            "user_id": self.user.id if self.user else None,
-            "place_id": self.place.id if self.place else None
+            "user_id": self.user_id,
+            "place_id": self.place_id,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
         }

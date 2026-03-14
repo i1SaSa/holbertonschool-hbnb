@@ -1,11 +1,7 @@
-from app import db  
-from app.models import user, place, review, amenity  
 from abc import ABC, abstractmethod
-from app import db
-
+from app.models.basemodel import db
 
 class Repository(ABC):
-
     @abstractmethod
     def add(self, obj):
         pass
@@ -30,9 +26,7 @@ class Repository(ABC):
     def get_by_attribute(self, attr_name, attr_value):
         pass
 
-
 class InMemoryRepository(Repository):
-
     def __init__(self):
         self._storage = {}
 
@@ -51,7 +45,8 @@ class InMemoryRepository(Repository):
             for key, value in data.items():
                 if hasattr(obj, key):
                     setattr(obj, key, value)
-            obj.update_timestamp()
+            if hasattr(obj, 'update_timestamp'):
+                obj.update_timestamp()
 
     def delete(self, obj_id):
         if obj_id in self._storage:
@@ -63,7 +58,6 @@ class InMemoryRepository(Repository):
              if getattr(obj, attr_name, None) == attr_value),
             None
         )
-
 
 class SQLAlchemyRepository(Repository):
     def __init__(self, model):

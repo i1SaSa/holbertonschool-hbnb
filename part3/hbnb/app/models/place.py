@@ -1,121 +1,78 @@
-import uuid
-from .basemodel import BaseModel
+#!/usr/bin/python3
+"""Place model module for the application."""
+from sqlalchemy import Column, String, Float, ForeignKey, Text
+from sqlalchemy.orm import validates, relationship
+from app.models.basemodel import BaseModel, db
 
 
 class Place(BaseModel):
-    """
-    This class represents a place in the system.
-    A place has an owner (User),
-    amenities and reviews.
-    """
+    """Place model for SQLAlchemy"""
+    __tablename__ = 'places'
 
-    def __init__(self, title, description, price, latitude, longitude, owner):
-        super().__init__()
+    # Columns
+    title = Column(String(100), nullable=False)
+    description = Column(Text, nullable=True)
+    price = Column(Float, nullable=False)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
 
-        self.title = title
-        self.description = description
-        self.price = price
-        self.latitude = latitude
-        self.longitude = longitude
+    # Foreign Keys
+    owner_id = Column(String(36), ForeignKey('users.id'), nullable=False)
+    owner = relationship('User', back_populates='places', lazy=True)
 
-        self.owner = owner
+    # Relationships
+    amenities = relationship('Amenity', secondary='place_amenity', lazy='subquery',
+                             backref=db.backref('places', lazy=True))
+    reviews = relationship('Review', back_populates='place', lazy=True, cascade='all, delete-orphan')
 
-        # List of Amenity objects
-        self.amenities = []
-
-        # List of Review objects
-        self.reviews = []
+    def __init__(self, **kwargs):
+        """Initialize place"""
+        super().__init__(**kwargs)
 
     # ----------------------
-    # Title
+    # Validators
     # ----------------------
-
-    @property
-    def title(self):
-        return self._title
-
-    @title.setter
-    def title(self, value):
-        if not isinstance(value, str):
+    @validates('title')
+    def validate_title(self, key, title):
+        """Validate title"""
+        if not isinstance(title, str):
             raise TypeError("Title must be a string")
-
-        super().is_max_length("title", value, 100)
-
-        if len(value.strip()) == 0:
+        if len(title) > 100:
+            raise ValueError("Title must be 100 characters max.")
+        if len(title.strip()) == 0:
             raise ValueError("Title cannot be empty")
+        return title.strip()
 
-        self._title = value
-
-    # ----------------------
-    # Price
-    # ----------------------
-
-    @property
-    def price(self):
-        return self._price
-
-    @price.setter
-    def price(self, value):
-        if not isinstance(value, (int, float)):
+    @validates('price')
+    def validate_price(self, key, price):
+        """Validate price"""
+        if not isinstance(price, (int, float)):
             raise TypeError("Price must be a number")
-
-        if value <= 0:
+        if price <= 0:
             raise ValueError("Price must be greater than 0")
+        return float(price)
 
-        self._price = value
-
-    # ----------------------
-    # Latitude
-    # ----------------------
-
-    @property
-    def latitude(self):
-        return self._latitude
-
-    @latitude.setter
-    def latitude(self, value):
-        if not isinstance(value, (int, float)):
+    @validates('latitude')
+    def validate_latitude(self, key, lat):
+        """Validate latitude"""
+        if not isinstance(lat, (int, float)):
             raise TypeError("Latitude must be a number")
-
-        if value < -90 or value > 90:
+        if lat < -90 or lat > 90:
             raise ValueError("Latitude must be between -90 and 90")
+        return float(lat)
 
-        self._latitude = value
-
-    # ----------------------
-    # Longitude
-    # ----------------------
-
-    @property
-    def longitude(self):
-        return self._longitude
-
-    @longitude.setter
-    def longitude(self, value):
-        if not isinstance(value, (int, float)):
+    @validates('longitude')
+    def validate_longitude(self, key, lon):
+        """Validate longitude"""
+        if not isinstance(lon, (int, float)):
             raise TypeError("Longitude must be a number")
-
-        if value < -180 or value > 180:
+        if lon < -180 or lon > 180:
             raise ValueError("Longitude must be between -180 and 180")
+        return float(lon)
 
-        self._longitude = value
-
-    # -----------
-    # Review
-    # ----------
-
-    def add_review(self, review):
-        if review not in self.reviews:
-            self.reviews.append(review)
-
-    def remove_review(self, review):
-        if review in self.reviews:
-            self.reviews.remove(review)
-
-    # -----------
-    # amenity
-    # -----------
-
+    # ----------------------
+    # Amenity methods
+    # ----------------------
     def add_amenity(self, amenity):
         """Add an amenity to the place"""
         if amenity not in self.amenities:
@@ -126,11 +83,15 @@ class Place(BaseModel):
         if amenity in self.amenities:
             self.amenities.remove(amenity)
 
-    # ----------------------
-    # Serialization
-    # ----------------------
+    def update(self, data):
+        """Update place data with validation"""
+        for key, value in data.items():
+            if hasattr(self, key) and key not in ['id', 'created_at', 'updated_at', 'owner_id']:
+                setattr(self, key, value)
+        self.update_timestamp()
 
     def to_dict(self):
+        """Convert place to dictionary"""
         return {
             "id": self.id,
             "title": self.title,
@@ -138,7 +99,9 @@ class Place(BaseModel):
             "price": self.price,
             "latitude": self.latitude,
             "longitude": self.longitude,
-            "owner": self.owner.to_dict(),
+            "owner_id": self.owner_id,
             "amenities": [a.to_dict() for a in self.amenities],
-            "reviews": [r.to_dict() for r in self.reviews]
+            "reviews": [r.to_dict() for r in self.reviews],
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
         }

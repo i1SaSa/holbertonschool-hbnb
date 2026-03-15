@@ -27,6 +27,7 @@ login_model = api.model('Login', {
     "password": fields.String(required=True)
 })
 
+
 @api.route('/')
 class UserList(Resource):
     def get(self):
@@ -36,17 +37,14 @@ class UserList(Resource):
 
     @api.expect(user_create_model, validate=True)
     @api.marshal_with(user_model, code=201)
-    @jwt_required()
     def post(self):
-        """Create a new user (admin only)"""
-        current_user = get_jwt()
-        if not current_user.get('is_admin'):
-            return {'error': 'Admin privileges required'}, 403
+        """Create a new user (Public Registration)"""
 
         success, result = facade.create_user(request.json)
         if success:
             return result.to_dict(), 201
         return {'error': result}, 400
+
 
 @api.route('/<string:user_id>')
 class UserResource(Resource):
@@ -68,6 +66,7 @@ class UserResource(Resource):
         if success:
             return result.to_dict(), 200
         api.abort(400, result)
+
 
 @api.route('/login')
 class UserLogin(Resource):

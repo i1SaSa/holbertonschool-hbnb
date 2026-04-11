@@ -78,8 +78,12 @@ class ReviewResource(Resource):
         if not review:
             api.abort(404, "Review not found")
 
-        if review.user_id != get_jwt_identity():
-            api.abort(403, "You can only delete your own review")
+        current_user_id = get_jwt_identity()
+        current_user_claims = get_jwt()
+
+        if review.user_id != current_user_id and not current_user_claims.get('is_admin'):
+            api.abort(
+                403, "You can only delete your own review unless you are an admin")
 
         success, result = facade.delete_review(review_id)
         if success:

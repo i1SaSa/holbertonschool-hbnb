@@ -6,14 +6,14 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>HBnB - Place Details</title>
 	<link rel="stylesheet" href="style.css">
-	<link rel="icon" href="logo.png" type="image/png">
+	<link rel="icon" href="images/icon.png" type="image/png">
 </head>
 
 <body>
 
 	<header>
 		<a href="index.html">
-			<img src="logo.png" alt="HBnB Logo" class="logo">
+			<img src="images/logo.png" alt="HBnB Logo" class="logo">
 		</a>
 		<a href="login.html" class="login-button" id="login-link">Login</a>
 	</header>
@@ -29,24 +29,8 @@
 
 		<section class="reviews-section">
 			<h2>Reviews</h2>
-
 			<div id="reviews-list" style="display: flex; flex-wrap: wrap; gap: 20px; width: 100%;">
 			</div>
-
-			<section class="add-review" id="add-review" style="display: none;">
-				<h3>Leave a Review</h3>
-				<form class="form" id="review-form">
-					<div class="form-group">
-						<label for="rating">Rating (1-5):</label>
-						<input type="number" id="rating" name="rating" min="1" max="5" required>
-					</div>
-					<div class="form-group">
-						<label for="comment">Comment:</label>
-						<textarea id="comment" name="comment" rows="4" required></textarea>
-					</div>
-					<button type="submit" class="login-button">Submit Review</button>
-				</form>
-			</section>
 		</section>
 	</main>
 

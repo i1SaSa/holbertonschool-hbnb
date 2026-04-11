@@ -1,6 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from flask import request
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt, verify_jwt_in_request
 from app.services.facade import HBnBFacade
 
 api = Namespace('places', description='Place operations')
@@ -29,6 +29,7 @@ place_create_model = api.model('PlaceCreate', {
     'amenities': fields.List(fields.String)
 })
 
+
 @api.route('/')
 class PlaceList(Resource):
     @jwt_required()
@@ -48,6 +49,7 @@ class PlaceList(Resource):
         places = facade.get_all_places()
         return [p.to_dict() for p in places], 200
 
+
 @api.route('/<string:place_id>')
 class PlaceResource(Resource):
     def get(self, place_id):
@@ -64,14 +66,17 @@ class PlaceResource(Resource):
         if not place:
             api.abort(404, "Place not found")
 
-        user_id = get_jwt_identity()
-        if place.owner_id != user_id:
-            api.abort(403, "You can only modify your own place")
+        current_user_id = get_jwt_identity()
+        current_user_claims = get_jwt()
 
+        if place.owner_id != current_user_id and not current_user_claims.get('is_admin'):
+            api.abort(
+                403, "You can only modify your own place unless you are an admin")
         success, result = facade.update_place(place_id, request.json)
         if success:
             return result.to_dict(), 200
         api.abort(400, result)
+
 
 @api.route('/<string:place_id>/reviews')
 class PlaceReviewList(Resource):

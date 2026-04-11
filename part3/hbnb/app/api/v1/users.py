@@ -74,7 +74,6 @@ class UserResource(Resource):
         current_user_id = get_jwt_identity()
         current_user_claims = get_jwt()
 
-        # الشرط الجديد: إذا ما كنت أنت نفس اليوزر، وما كنت أدمن -> نمنعك
         if current_user_id != user_id and not current_user_claims.get('is_admin'):
             api.abort(
                 403, "You can only modify your own account unless you are an admin")

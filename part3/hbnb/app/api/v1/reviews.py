@@ -1,6 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from flask import request
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt, verify_jwt_in_request
 from app.services.facade import HBnBFacade
 
 api = Namespace('reviews', description='Review operations')
@@ -23,6 +23,7 @@ review_create_model = api.model('ReviewCreate', {
     'place_id': fields.String(required=True)
 })
 
+
 @api.route('/')
 class ReviewList(Resource):
     @jwt_required()
@@ -42,6 +43,7 @@ class ReviewList(Resource):
         reviews = facade.get_all_reviews()
         return [r.to_dict() for r in reviews], 200
 
+
 @api.route('/<string:review_id>')
 class ReviewResource(Resource):
     def get(self, review_id):
@@ -58,9 +60,12 @@ class ReviewResource(Resource):
         if not review:
             api.abort(404, "Review not found")
 
-        if review.user_id != get_jwt_identity():
-            api.abort(403, "You can only modify your own review")
+        current_user_id = get_jwt_identity()
+        current_user_claims = get_jwt()
 
+        if review.user_id != current_user_id and not current_user_claims.get('is_admin'):
+            api.abort(
+                403, "You can only modify your own review unless you are an admin")
         success, result = facade.update_review(review_id, request.json)
         if success:
             return result.to_dict(), 200

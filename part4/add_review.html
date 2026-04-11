@@ -4,24 +4,49 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Add Review</title>
-	<link rel="stylesheet" href="styles.css">
+	<title>HBnB - Add Review</title>
+	<link rel="stylesheet" href="style.css">
+	<link rel="icon" href="images/icon.png" type="image/png">
 </head>
 
 <body>
+	<header>
+		<a href="index.html">
+			<img src="images/logo.png" alt="HBnB Logo" class="logo">
+		</a>
+	</header>
+
+	<nav>
+		<a href="index.html">Home</a>
+	</nav>
+
 	<main>
-		<!-- Add something to idfentify the place you're reviewing -->
-		<form id="review-form">
-			<h2>Add a Review</h2>
-			<label for="review">Your Review:</label>
-			<textarea id="review" name="review" required></textarea>
-			<label for="rating">Rating:</label>
-			<select id="rating" name="rating" required>
-				<!-- Options for rating -->
-			</select>
-			<button type="submit">Submit Review</button>
-		</form>
+		<section class="add-review" style="display: block;">
+			<h1 id="review-place-name">Add a Review</h1>
+			<form id="review-form" class="form">
+				<div class="form-group">
+					<label for="review">Your Review:</label>
+					<textarea id="review" name="review" rows="4" required></textarea>
+				</div>
+				<div class="form-group">
+					<label for="rating">Rating:</label>
+					<select id="rating" name="rating" required>
+						<option value="5">5 Stars - Excellent</option>
+						<option value="4">4 Stars - Very Good</option>
+						<option value="3">3 Stars - Average</option>
+						<option value="2">2 Stars - Poor</option>
+						<option value="1">1 Star - Terrible</option>
+					</select>
+				</div>
+				<button type="submit" class="login-button">Submit Review</button>
+			</form>
+		</section>
 	</main>
+
+	<footer>
+		<p>&copy; 2026 HBnB Evolution. All rights reserved.</p>
+	</footer>
+
 	<script src="scripts.js"></script>
 </body>
 

@@ -1,27 +1,185 @@
-* {
-	box-sizing: border-box;
+/* ================== Global Styles ================== */
+body {
+	font-family: 'Helvetica Neue', Arial, sans-serif;
 	margin: 0;
 	padding: 0;
-	font-family: Arial, sans-serif;
+	background-color: #f9f9f9;
+	color: #484848;
 }
 
-body {
-	background-color: #f4f4f4;
-	color: #333;
-}
-
+/* ================== Header & Nav ================== */
 header {
-	background-color: #333;
-	color: #fff;
-	padding: 1rem;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 15px 30px;
+	background-color: #ffffff;
+	border-bottom: 1px solid #ddd;
+}
+
+.logo {
+	height: 40px;
+}
+
+.login-button {
+	padding: 10px 20px;
+	background-color: #FF5A5F;
+	color: #ffffff;
+	text-decoration: none;
+	border-radius: 5px;
+	font-weight: bold;
+	transition: background-color 0.3s;
+}
+
+.login-button:hover {
+	background-color: #e0484d;
+}
+
+nav {
+	background-color: #ffffff;
+	padding: 10px 30px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 nav a {
-	color: #fff;
 	text-decoration: none;
-	margin-left: 1rem;
+	color: #FF5A5F;
+	margin-right: 20px;
+	font-weight: bold;
 }
 
+/* ================== Main Content ================== */
 main {
-	padding: 2rem;
+	padding: 20px 30px;
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+.places-container,
+.reviews-section {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 20px;
+	/* Space between cards */
+}
+
+/* ================== Fixed Parameters (REQUIRED) ================== */
+.place-card,
+.review-card {
+	margin: 20px;
+	padding: 10px;
+	border: 1px solid #ddd;
+	border-radius: 10px;
+	background-color: #ffffff;
+}
+
+/* Additional styling for place card layout */
+.place-card {
+	width: calc(33.333% - 40px);
+	/* 3 columns with gaps */
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.place-card h2 {
+	margin-top: 0;
+	font-size: 1.5em;
+	color: #222;
+}
+
+.price {
+	color: #008489;
+	font-weight: bold;
+	font-size: 1.2em;
+}
+
+.details-button {
+	display: block;
+	text-align: center;
+	margin-top: 15px;
+	padding: 10px;
+	background-color: #008489;
+	color: white;
+	text-decoration: none;
+	border-radius: 5px;
+}
+
+.details-button:hover {
+	background-color: #006c70;
+}
+
+/* ================== Login & Review Forms ================== */
+.login-container,
+.add-review {
+	max-width: 500px;
+	margin: 40px auto;
+	padding: 20px;
+	background: #ffffff;
+	border: 1px solid #ddd;
+	border-radius: 10px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.form-group {
+	margin-bottom: 15px;
+}
+
+.form-group label {
+	display: block;
+	margin-bottom: 5px;
+	font-weight: bold;
+	color: #333;
+}
+
+.form-group input,
+.form-group textarea {
+	width: 100%;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-sizing: border-box;
+	/* عشان ما يخرب العرض */
+	font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+	outline: none;
+	border-color: #FF5A5F;
+}
+
+/* ================== Place Details & Review Card Styling ================== */
+.place-details h1 {
+	margin-top: 0;
+}
+
+.place-info p {
+	margin-bottom: 10px;
+}
+
+.place-info ul {
+	list-style-type: none;
+	padding: 0;
+}
+
+.place-info li {
+	background-color: #eee;
+	padding: 5px 10px;
+	border-radius: 5px;
+	display: inline-block;
+	margin-right: 5px;
+	margin-bottom: 5px;
+}
+
+.review-card {
+	width: calc(50% - 40px);
+	/* 2 reviews per row on average */
+}
+
+/* ================== Footer ================== */
+footer {
+	text-align: center;
+	padding: 20px;
+	background-color: #ffffff;
+	border-top: 1px solid #ddd;
+	margin-top: 40px;
 }

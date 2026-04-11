@@ -1,32 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Place Details</title>
-	<link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HBnB - Place Details</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="logo.png" type="image/png">
 </head>
-
 <body>
-	<main>
-		<section id="place-details">
-			<!-- Place details will be populated dynamically -->
-		</section>
-		<section id="reviews">
-			<!-- Reviews will be populated dynamically -->
-		</section>
-		<section id="add-review">
-			<h2>Add a Review</h2>
-			<form id="review-form">
-				<label for="review-text">Review:</label>
-				<textarea id="review-text" name="review-text" required></textarea>
 
-				<button type="submit">Submit</button>
-			</form>
-		</section>
-	</main>
-	<script src="scripts.js"></script>
+    <header>
+        <img src="logo.png" alt="HBnB Logo" class="logo">
+        <a href="login.html" class="login-button">Login</a>
+    </header>
+
+    <nav>
+        <a href="index.html">Home</a>
+    </nav>
+
+    <main>
+        <section class="place-details">
+            <h1>Cozy Apartment in Riyadh</h1>
+            
+            <div class="place-info">
+                <p><strong>Host:</strong> Mustafa</p>
+                <p><strong>Price:</strong> <span class="price">$120 / night</span></p>
+                <p><strong>Description:</strong> A beautiful and quiet place to stay in the heart of the city. Perfect for weekend getaways and business trips alike. Close to major attractions and public transport.</p>
+                
+                <h3>Amenities</h3>
+                <ul>
+                    <li>WiFi</li>
+                    <li>Air Conditioning</li>
+                    <li>Kitchen</li>
+                    <li>Free Parking</li>
+                    <li>Gym</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="reviews-section">
+            <h2>Reviews</h2>
+            
+            <article class="review-card">
+                <p><strong>Ahmed:</strong> "Amazing place! Very clean and exactly as described."</p>
+                <p><em>Rating: 5/5</em></p>
+            </article>
+
+            <article class="review-card">
+                <p><strong>Sarah:</strong> "Good location, but the WiFi was a bit slow."</p>
+                <p><em>Rating: 4/5</em></p>
+            </article>
+
+            <section class="add-review">
+                <h3>Leave a Review</h3>
+                <form class="form">
+                    <div class="form-group">
+                        <label for="rating">Rating (1-5):</label>
+                        <input type="number" id="rating" name="rating" min="1" max="5" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="comment">Comment:</label>
+                        <textarea id="comment" name="comment" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="login-button">Submit Review</button>
+                </form>
+            </section>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 HBnB Evolution. All rights reserved.</p>
+    </footer>
+
 </body>
-
 </html>

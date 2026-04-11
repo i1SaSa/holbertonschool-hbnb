@@ -5,11 +5,15 @@ from flask_jwt_extended import JWTManager
 import os
 from config import config
 from app.models.basemodel import db
+from flask_cors import CORS
 
 jwt = JWTManager()
 
+
 def create_app(config_name=None):
     app = Flask(__name__)
+
+    CORS(app)
 
     # Load configuration
     if config_name is None:

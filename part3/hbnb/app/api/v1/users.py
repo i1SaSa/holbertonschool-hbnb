@@ -1,6 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from flask import request
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt, verify_jwt_in_request
 from app.services.facade import HBnBFacade
 
 api = Namespace('users', description='User operations')
@@ -38,7 +38,20 @@ class UserList(Resource):
     @api.expect(user_create_model, validate=True)
     @api.marshal_with(user_model, code=201)
     def post(self):
-        """Create a new user (Public Registration)"""
+        """Create a new user"""
+        data = request.json
+
+        is_admin_request = False
+        try:
+            verify_jwt_in_request(optional=True)
+            current_user_claims = get_jwt()
+            if current_user_claims and current_user_claims.get('is_admin'):
+                is_admin_request = True
+        except Exception:
+            pass
+
+        if not is_admin_request:
+            data['is_admin'] = False
 
         success, result = facade.create_user(request.json)
         if success:
@@ -58,10 +71,13 @@ class UserResource(Resource):
     @jwt_required()
     def put(self, user_id):
         """Update user"""
-        current_user = get_jwt_identity()
-        if current_user != user_id:
-            api.abort(403, "You can only modify your own account")
+        current_user_id = get_jwt_identity()
+        current_user_claims = get_jwt()
 
+        # الشرط الجديد: إذا ما كنت أنت نفس اليوزر، وما كنت أدمن -> نمنعك
+        if current_user_id != user_id and not current_user_claims.get('is_admin'):
+            api.abort(
+                403, "You can only modify your own account unless you are an admin")
         success, result = facade.update_user(user_id, request.json)
         if success:
             return result.to_dict(), 200

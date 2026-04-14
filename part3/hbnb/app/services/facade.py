@@ -5,6 +5,7 @@ from app.models.review import Review
 from app.services.repositories import UserRepository, PlaceRepository, ReviewRepository, AmenityRepository
 from app import db
 
+
 class HBnBFacade:
     def __init__(self):
         self.user_repository = UserRepository()
@@ -160,6 +161,17 @@ class HBnBFacade:
         except (ValueError, TypeError) as e:
             return False, str(e)
 
+    def delete_place(self, place_id):
+        try:
+            lace = self.place_repository.get(place_id)
+            if not place_id:
+                return False, "Place not found"
+
+            self.place_repository.delete(place_id)
+            return True, None
+        except Exception as e:
+            return False, str(e)
+
     # ================= REVIEWS =================
     def create_review(self, review_data):
         try:
@@ -179,7 +191,8 @@ class HBnBFacade:
                 return False, "You cannot review your own place"
 
             # Check if user already reviewed this place
-            existing_reviews = self.review_repository.get_reviews_by_place(place_id)
+            existing_reviews = self.review_repository.get_reviews_by_place(
+                place_id)
             for review in existing_reviews:
                 if review.user_id == user.id:
                     return False, "You have already reviewed this place"

@@ -233,7 +233,7 @@ async function submitReview(token, placeId, userId, reviewText, rating) {
 			})
 		});
 
-		if (response.ok) {
+		if (response.ok || response.status === 201) {
 			alert('Review submitted successfully! ');
 			window.location.href = `place.html?id=${placeId}`;
 		} else {

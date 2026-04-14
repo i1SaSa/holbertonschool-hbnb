@@ -72,9 +72,22 @@ async function loginUser(email, password) {
 function checkAuthentication() {
 	const token = getCookie('token');
 	const loginLink = document.getElementById('login-link');
+	const signupLink = document.getElementById('signup-link');
+	const addPlaceBtn = document.getElementById('add-place-btn');
+
 	if (!token && loginLink) loginLink.style.display = 'block';
 	else if (token && loginLink) loginLink.style.display = 'none';
 	fetchPlaces(token);
+
+	if (!token) {
+		if (loginLink) loginLink.style.display = 'inline-block';
+		if (signupLink) signupLink.style.display = 'inline-block';
+		if (addPlaceBtn) addPlaceBtn.style.display = 'none';
+	} else {
+		if (loginLink) loginLink.style.display = 'none';
+		if (signupLink) signupLink.style.display = 'none';
+		if (addPlaceBtn) addPlaceBtn.style.display = 'inline-block';
+	}
 }
 
 async function fetchPlaces(token) {
@@ -151,7 +164,6 @@ function checkAuthenticationForReview() {
 	return token;
 }
 
-// إرسال التقييم للباك إند
 async function submitReview(token, placeId, reviewText, rating) {
 	try {
 		const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}/reviews`, {
@@ -178,4 +190,77 @@ async function submitReview(token, placeId, reviewText, rating) {
 		console.error('Error:', error);
 		alert('Server is offline!');
 	}
+}
+
+const signupForm = document.getElementById('signup-form');
+if (signupForm) {
+	signupForm.addEventListener('submit', async (event) => {
+		event.preventDefault();
+		const firstName = document.getElementById('first_name').value;
+		const lastName = document.getElementById('last_name').value;
+		const email = document.getElementById('signup_email').value;
+		const password = document.getElementById('signup_password').value;
+
+		try {
+			const response = await fetch('http://127.0.0.1:5000/api/v1/users/', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					first_name: firstName,
+					last_name: lastName,
+					email: email,
+					password: password
+				})
+			});
+
+			if (response.ok) {
+				alert('Account created successfully! Please login.');
+				window.location.href = 'login.html';
+			} else {
+				const errorData = await response.json();
+				alert('Signup failed: ' + (errorData.message || 'Email may exist'));
+			}
+		} catch (error) { console.error('Error:', error); }
+	});
+}
+
+const addPlaceForm = document.getElementById('add-place-form');
+if (addPlaceForm) {
+	const token = getCookie('token');
+	if (!token) window.location.href = 'login.html';
+
+	addPlaceForm.addEventListener('submit', async (event) => {
+		event.preventDefault();
+
+		const selectedAmenities = Array.from(document.querySelectorAll('input[name="amenity"]:checked'))
+			.map(checkbox => checkbox.value);
+
+		const placeData = {
+			title: document.getElementById('title').value,
+			description: document.getElementById('description').value,
+			price: parseFloat(document.getElementById('price').value),
+			latitude: parseFloat(document.getElementById('lat').value),
+			longitude: parseFloat(document.getElementById('lng').value),
+			amenities: selectedAmenities
+		};
+
+		try {
+			const response = await fetch('http://127.0.0.1:5000/api/v1/places/', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				},
+				body: JSON.stringify(placeData)
+			});
+
+			if (response.status === 201 || response.ok) {
+				alert('Place created successfully! 🏘️');
+				window.location.href = 'index.html';
+			} else {
+				const errorData = await response.json();
+				alert('Failed to create place: ' + (errorData.message || 'Unauthorized'));
+			}
+		} catch (error) { console.error('Error:', error); }
+	});
 }

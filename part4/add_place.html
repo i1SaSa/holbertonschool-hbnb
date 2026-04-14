@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>HBnB - Add New Place</title>
+	<link rel="stylesheet" href="style.css">
+	<link rel="icon" href="images/icon.png" type="image/png">
+</head>
+
+<body>
+	<header>
+		<a href="index.html"><img src="images/logo.png" alt="HBnB Logo" class="logo"></a>
+	</header>
+
+	<nav>
+		<a href="index.html">Home</a>
+	</nav>
+
+	<main>
+		<section class="add-review">
+			<h1>Host a New Place</h1>
+			<form id="add-place-form" class="form">
+				<div class="form-group">
+					<label for="title">Place Title:</label>
+					<input type="text" id="title" required placeholder="e.g. Luxury Villa in Jeddah">
+				</div>
+				<div class="form-group">
+					<label for="description">Description:</label>
+					<textarea id="description" rows="3" required></textarea>
+				</div>
+				<div class="form-group">
+					<label for="price">Price per night ($):</label>
+					<input type="number" id="price" required min="1">
+				</div>
+
+				<input type="hidden" id="lat" value="24.7136">
+				<input type="hidden" id="lng" value="46.6753">
+
+				<div class="form-group">
+					<label>Amenities:</label>
+					<div style="display: flex; gap: 10px; flex-wrap: wrap;">
+						<label><input type="checkbox" name="amenity" value="WiFi"> WiFi</label>
+						<label><input type="checkbox" name="amenity" value="Pool"> Pool</label>
+						<label><input type="checkbox" name="amenity" value="Air Conditioning"> Air Conditioning</label>
+						<label><input type="checkbox" name="amenity" value="Gym"> Gym</label>
+					</div>
+				</div>
+
+				<button type="submit" class="login-button">Create Place</button>
+			</form>
+		</section>
+	</main>
+
+	<footer>
+		<p>&copy; 2026 HBnB Evolution.</p>
+	</footer>
+	<script src="scripts.js"></script>
+</body>
+
+</html>

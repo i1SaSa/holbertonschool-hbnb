@@ -86,6 +86,7 @@ function checkAuthentication() {
 		if (signupLink) signupLink.style.display = 'none';
 		if (addPlaceBtn) addPlaceBtn.style.display = 'inline-block';
 		if (logoutBtn) logoutBtn.style.display = 'inline-block';
+		fetchPlaces(token);
 	}
 }
 
@@ -140,19 +141,42 @@ async function fetchPlaceDetails(token, placeId) {
 	try {
 		const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
 		const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`, { headers });
+
 		if (response.ok) {
 			const place = await response.json();
+
 			const placeDetails = document.getElementById('place-details');
 			placeDetails.innerHTML = `
                 <h1>${place.title}</h1>
                 <p><strong>Price:</strong> <span class="price">$${place.price} / night</span></p>
                 <p>${place.description}</p>
             `;
+
 			if (token) {
 				placeDetails.innerHTML += `<br><a href="add_review.html?id=${place.id}" class="login-button">Add Review</a>`;
 			}
+
+			const reviewsList = document.getElementById('reviews-list');
+			if (reviewsList) {
+				reviewsList.innerHTML = '';
+				if (place.reviews && place.reviews.length > 0) {
+					place.reviews.forEach(review => {
+						const reviewHtml = `
+                            <div class="review-card" style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; background: #f9f9f9; width: 100%;">
+                                <p style="margin: 0;"><strong>Rating:</strong> ${'⭐'.repeat(review.rating)}</p>
+                                <p style="margin: 10px 0 0 0; color: #555;">${review.text}</p>
+                            </div>
+                        `;
+						reviewsList.innerHTML += reviewHtml;
+					});
+				} else {
+					reviewsList.innerHTML = '<p style="color: #888;">No reviews yet. Be the first to rate this place!</p>';
+				}
+			}
 		}
-	} catch (error) { console.error('Error:', error); }
+	} catch (error) {
+		console.error('Error:', error);
+	}
 }
 
 function checkAuthenticationForReview() {

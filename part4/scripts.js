@@ -93,7 +93,7 @@ function checkAuthentication() {
 async function fetchPlaces(token) {
 	try {
 		const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
-		const response = await fetch('http://127.0.0.1:5000/api/v1/places', { headers });
+		const response = await fetch('http://127.0.0.1:5000/api/v1/places/', { headers });
 		if (response.ok) {
 			const places = await response.json();
 			displayPlaces(places);

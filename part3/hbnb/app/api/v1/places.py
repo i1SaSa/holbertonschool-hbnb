@@ -77,6 +77,27 @@ class PlaceResource(Resource):
             return result.to_dict(), 200
         api.abort(400, result)
 
+    @jwt_required()
+    def delete(self, place_id):
+        """Delete place"""
+        place = facade.get_place(place_id)
+        if not place:
+            api.abort(404, "Place not found")
+
+        current_user_id = get_jwt_identity()
+        claims = get_jwt()
+        is_admin = claims.get("is_admin", False)
+
+        if place.owner_id != current_user_id and not is_admin:
+            api.abort(
+                403, "You can only delete your own place unless you are admin")
+
+        success, result = facade.delete_place(place_id)
+        if success:
+            return {"message": "Place deleted successfully"}, 200
+
+        api.abort(400, result)
+
 
 @api.route('/<string:place_id>/reviews')
 class PlaceReviewList(Resource):

@@ -143,9 +143,12 @@ function checkPlaceAuthentication(placeId) {
 async function fetchPlaceDetails(token, placeId) {
 	try {
 		const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+
 		const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`, { headers });
 
-		if (!response.ok) throw new Error('Failed to fetch data');
+		if (!response.ok) {
+			throw new Error('Failed to fetch data');
+		}
 
 		const place = await response.json();
 
@@ -159,11 +162,14 @@ async function fetchPlaceDetails(token, placeId) {
 			}
 		}
 
+		const canDeletePlace = isAdmin || (userId && userId == place.owner_id);
+
 		const placeDetails = document.getElementById('place-details');
 		placeDetails.innerHTML = `
             <h1>${place.title}</h1>
             <p><strong>Price:</strong> <span class="price">$${place.price} / night</span></p>
             <p>${place.description}</p>
+            ${canDeletePlace ? `<button onclick="deletePlace('${place.id}')" style="background:#dc3545; color:white; border:none; padding:8px 15px; cursor:pointer; border-radius:5px; margin-top:10px; font-weight:bold;">Delete Place 🗑️</button>` : ''}
         `;
 
 		if (token) {
@@ -175,14 +181,13 @@ async function fetchPlaceDetails(token, placeId) {
 			reviewsList.innerHTML = '';
 			if (place.reviews && place.reviews.length > 0) {
 				place.reviews.forEach(review => {
-
 					const canDeleteReview = isAdmin || (userId && userId == review.user_id);
 
 					const reviewHtml = `
                         <div class="review-card" style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; background: #f9f9f9; width: 100%;">
                             <p style="margin: 0;"><strong>Rating:</strong> ${'⭐'.repeat(review.rating)}</p>
                             <p style="margin: 10px 0 0 0; color: #555;">${review.text}</p>
-                            ${canDeleteReview ? `<button onclick="deleteReview('${review.id}', '${place.id}')" style="color:#dc3545; background:none; border:none; cursor:pointer; margin-top:10px; font-weight:bold;">Delete Review ❌</button>` : ''}
+                            ${canDeleteReview ? `<button onclick="deleteReview('${review.id}', '${place.id}')" style="color:#dc3545; background:none; border:none; cursor:pointer; margin-top:10px; font-weight:bold;">Delete ❌</button>` : ''}
                         </div>
                     `;
 					reviewsList.innerHTML += reviewHtml;
@@ -194,7 +199,7 @@ async function fetchPlaceDetails(token, placeId) {
 
 	} catch (error) {
 		console.error('Error fetching place details:', error);
-		document.getElementById('place-details').innerHTML = '<p style="color:red; font-weight:bold;">Error loading place details.</p>';
+		document.getElementById('place-details').innerHTML = '<p style="color:red; font-weight:bold;">Error loading place details. Server might be down.</p>';
 	}
 }
 
@@ -324,7 +329,31 @@ function getPayload(token) {
 	}
 }
 
+async function deletePlace(placeId) {
+	if (!confirm("Are you sure you want to delete this place?")) return;
 
+	const token = getCookie('token');
+	try {
+		const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`, {
+			method: 'DELETE',
+			headers: {
+				'Authorization': `Bearer ${token}`,
+				'Content-Type': 'application/json'
+			}
+		});
+
+		if (response.ok || response.status === 204 || response.status === 200) {
+			alert("Place deleted successfully! 🗑️");
+			window.location.href = 'index.html';
+		} else {
+			const errorData = await response.json();
+			alert("Failed to delete place: " + (errorData.message || "Make sure you have the right permissions"));
+		}
+	} catch (error) {
+		console.error('Error deleting place:', error);
+		alert("Server is offline! Can't delete place.");
+	}
+}
 
 async function deleteReview(reviewId, placeId) {
 	if (!confirm("Are you sure you want to delete this review?")) return;

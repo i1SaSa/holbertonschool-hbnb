@@ -74,19 +74,18 @@ function checkAuthentication() {
 	const loginLink = document.getElementById('login-link');
 	const signupLink = document.getElementById('signup-link');
 	const addPlaceBtn = document.getElementById('add-place-btn');
-
-	if (!token && loginLink) loginLink.style.display = 'block';
-	else if (token && loginLink) loginLink.style.display = 'none';
-	fetchPlaces(token);
+	const logoutBtn = document.getElementById('logout-btn');
 
 	if (!token) {
 		if (loginLink) loginLink.style.display = 'inline-block';
 		if (signupLink) signupLink.style.display = 'inline-block';
 		if (addPlaceBtn) addPlaceBtn.style.display = 'none';
+		if (logoutBtn) logoutBtn.style.display = 'none';
 	} else {
 		if (loginLink) loginLink.style.display = 'none';
 		if (signupLink) signupLink.style.display = 'none';
 		if (addPlaceBtn) addPlaceBtn.style.display = 'inline-block';
+		if (logoutBtn) logoutBtn.style.display = 'inline-block';
 	}
 }
 
@@ -262,5 +261,14 @@ if (addPlaceForm) {
 				alert('Failed to create place: ' + (errorData.message || 'Unauthorized'));
 			}
 		} catch (error) { console.error('Error:', error); }
+	});
+}
+const logoutBtn = document.getElementById('logout-btn');
+if (logoutBtn) {
+	logoutBtn.addEventListener('click', () => {
+		document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+		alert('Logged out successfully! 👋');
+		window.location.reload();
 	});
 }

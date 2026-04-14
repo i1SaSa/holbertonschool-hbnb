@@ -34,9 +34,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		addReviewForm.addEventListener('submit', async (event) => {
 			event.preventDefault();
+
 			const reviewText = document.getElementById('review').value;
 			const rating = document.getElementById('rating').value;
-			await submitReview(reviewToken, placeId, reviewText, rating);
+
+			const payload = getPayload(reviewToken);
+			const userId = payload ? (payload.sub || payload.user_id) : null;
+
+			await submitReview(reviewToken, placeId, userId, reviewText, rating);
 		});
 	}
 });
@@ -214,7 +219,7 @@ function checkAuthenticationForReview() {
 
 async function submitReview(token, placeId, userId, reviewText, rating) {
 	try {
-		const response = await fetch(`http://127.0.0.1:5000/api/v1/reviews`, {
+		const response = await fetch(`http://127.0.0.1:5000/api/v1/reviews/`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

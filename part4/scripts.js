@@ -181,6 +181,7 @@ async function fetchPlaceDetails(token, placeId) {
 			reviewsList.innerHTML = '';
 			if (place.reviews && place.reviews.length > 0) {
 				place.reviews.forEach(review => {
+					console.log("Current User:", userId, "Review Author:", review.user_id, "Is Admin:", isAdmin);
 					const canDeleteReview = isAdmin || (userId && userId == review.user_id);
 
 					const reviewHtml = `
@@ -211,9 +212,9 @@ function checkAuthenticationForReview() {
 	return token;
 }
 
-async function submitReview(token, placeId, reviewText, rating) {
+async function submitReview(token, placeId, userId, reviewText, rating) {
 	try {
-		const response = await fetch(`http://127.0.0.1:5000/api/v1/reviews/`, {
+		const response = await fetch(`http://127.0.0.1:5000/api/v1/reviews`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -222,7 +223,8 @@ async function submitReview(token, placeId, reviewText, rating) {
 			body: JSON.stringify({
 				text: reviewText,
 				rating: parseInt(rating),
-				place_id: placeId
+				place_id: placeId,
+				user_id: userId
 			})
 		});
 
